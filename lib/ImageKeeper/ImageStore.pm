@@ -18,7 +18,7 @@ sub put {
 
     my $dir = $self->_sha1_to_path($sha1);
 
-    if (-d $dir) {
+    if (-d "$dir") {
         return 1;
     }
 
@@ -33,15 +33,15 @@ sub put {
 }
 
 sub get {
-    my ($self, $sha1, $data, $format) = @_;
+    my ($self, $sha1, $format) = @_;
 
-    my $dir = $self->_sha1_to_path($sha1);
+    my $file = $self->_sha1_to_path($sha1)->file("original.${format}");
 
-    unless (-d $dir) {
+    unless (-f "$file") {
         return undef;
     }
 
-    return $dir->file("original.${format}");
+    return $file->slurp;
 }
 
 1;

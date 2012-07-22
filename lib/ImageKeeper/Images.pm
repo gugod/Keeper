@@ -31,9 +31,13 @@ sub download {
     my $format = $self->stash("format");
 
     my $store = ImageKeeper::ImageStore->new( root => $self->app->home->rel_dir("images") );
-    my $filename = $store->get($sha1, $format);
+    my $data = $store->get($sha1, $format);
 
-    $self->render_static($filename);
+    unless (defined($data)) {
+        $self->render_text("NOT FOUND", status => 404);
+    }
+
+    $self->render_data($data, format => $format);
 }
 
 1;
