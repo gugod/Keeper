@@ -7,8 +7,10 @@ sub startup {
 
     # Routes
     my $r = $self->routes;
-    $r->get("/images/:sha1")->to("images#download");
-    $r->put("/images/:sha1")->to("images#upload");
+
+    my $images = $r->route("/images/:sha1")->to(controller => "images");
+    $images->get->to("#download");
+    $images->put->to("#upload");
 
 }
 
