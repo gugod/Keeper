@@ -3,16 +3,13 @@ use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
 sub startup {
-  my $self = shift;
+    my $self = shift;
 
-  # Documentation browser under "/perldoc"
-  $self->plugin('PODRenderer');
+    # Routes
+    my $r = $self->routes;
+    $r->get("/images/:sha1")->to("images#download");
+    $r->put("/images/:sha1")->to("images#upload");
 
-  # Router
-  my $r = $self->routes;
-
-  # Normal route to controller
-  $r->get('/')->to('example#welcome');
 }
 
 1;
