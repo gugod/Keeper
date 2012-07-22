@@ -1,8 +1,8 @@
-package ImageKeeper::Images;
+package Keeper::Images;
 use Mojo::Base 'Mojolicious::Controller';
 
 use Digest::SHA1 qw(sha1_hex);
-use ImageKeeper::ImageStore;
+use Keeper::ImageStore;
 
 sub upload {
     my $self = shift;
@@ -18,7 +18,7 @@ sub upload {
         return;
     }
 
-    my $store = ImageKeeper::ImageStore->new( root => $self->app->home->rel_dir("images") );
+    my $store = Keeper::ImageStore->new( root => $self->app->home->rel_dir("images") );
     $store->put($body_sha1, $body, $claimed_format);
 
     $self->render_text("OK");
@@ -30,7 +30,7 @@ sub download {
     my $sha1 = $self->stash("sha1");
     my $format = $self->stash("format");
 
-    my $store = ImageKeeper::ImageStore->new( root => $self->app->home->rel_dir("images") );
+    my $store = Keeper::ImageStore->new( root => $self->app->home->rel_dir("images") );
     my $data = $store->get($sha1, $format);
 
     unless (defined($data)) {

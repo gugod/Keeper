@@ -1,4 +1,4 @@
-package ImageKeeper::ImageStore;
+package Keeper::ImageStore;
 use Moo;
 use Path::Class;
 use File::Path::Tiny;

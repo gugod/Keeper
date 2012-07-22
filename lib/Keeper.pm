@@ -1,4 +1,4 @@
-package ImageKeeper;
+package Keeper;
 use Mojo::Base 'Mojolicious';
 
 # This method will run once at server start
