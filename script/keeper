@@ -11,4 +11,4 @@ my $lib = join('/', @base, 'lib');
 
 # Start commands for application
 require Mojolicious::Commands;
-Mojolicious::Commands->start_app('ImageKeeper');
+Mojolicious::Commands->start_app('Keeper');
