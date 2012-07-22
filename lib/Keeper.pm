@@ -5,6 +5,8 @@ use Mojo::Base 'Mojolicious';
 sub startup {
     my $self = shift;
 
+    $self->defaults( "image_store_root" => $self->app->home->rel_dir("store/images") );
+
     # Routes
     my $r = $self->routes;
 
