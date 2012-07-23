@@ -44,4 +44,14 @@ sub get {
     return $file->slurp;
 }
 
+sub get_path {
+    my ($self, $sha1, $format) = @_;
+    my $file = $self->_sha1_to_path($sha1)->file("original.${format}");
+
+    unless (-f "$file") {
+        return undef;
+    }
+    return $file;
+}
+
 1;

@@ -28,15 +28,17 @@ sub download {
 
     my $sha1 = $self->stash("sha1");
     my $format = $self->stash("format");
+    my $image_store_root = $self->stash("image_store_root");
 
-    my $store = Keeper::ImageStore->new(root => $self->stash("image_store_root") );
-    my $data = $store->get($sha1, $format);
+    my $store = Keeper::ImageStore->new(root => $image_store_root);
+    my $path  = $store->get_path($sha1, $format);
 
-    unless (defined($data)) {
+    unless (defined($path)) {
         $self->render_text("NOT FOUND", status => 404);
     }
 
-    $self->render_data($data, format => $format);
+    $path =~ s{^$image_store_root}{/image_store};
+    $self->res->headers->header("X-Accel-Redirect" => $path);
 }
 
 1;

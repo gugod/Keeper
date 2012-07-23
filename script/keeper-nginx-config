@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+use FindBin;
+use Cwd;
+
+my $app_home = Cwd::realpath("$FindBin::Bin/..");
+
+local $/ = undef;
+my $config = <DATA>;
+
+my $app_home = 
+$config =~ s/APP_HOME/$app_home/sg;
+
+print $config;
+
+__DATA__
+
+    server {
+        listen 80;
+        server_name keeper.ele.local;
+        root  APP_HOME/public;
+
+        location /image_store {
+            internal;
+            alias APP_HOME/store/images;
+        }
+        location / {
+            try_files $uri @fallback;
+        }
+        location @fallback {
+            proxy_set_header  X-Real-IP        $remote_addr;
+            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
+            proxy_set_header  Host             $http_host;
+            proxy_redirect    off;
+            proxy_pass        http://localhost:5000;
+            proxy_set_header  X-Real-IP  $remote_addr;
+        }
+    }
+
