@@ -5,7 +5,6 @@ use Cwd;
 
 my $app_home = $ENV{APP_HOME} || Cwd::realpath("$FindBin::Bin/..");
 my $app_host = $ENV{APP_HOST} || "keeper.example.com";
-my $app_listen = $ENV{MOJO_LISTEN} || "http://127.0.0.1:5000";
 
 local $/ = undef;
 my $config = <DATA>;
@@ -18,25 +17,23 @@ print $config;
 
 __DATA__
 
-    server {
-        listen 80;
-        server_name APP_HOST;
-        root  APP_HOME/public;
+server {
+    listen 80;
+    server_name APP_HOST;
+    root        APP_HOME/public;
+    access_log  APP_HOME/log/nginx.access.log;
+    error_log   APP_HOME/log/nginx.error.log;
 
-        location /blob_store {
-            internal;
-            alias APP_HOME/store/blobs;
-        }
-        location / {
-            try_files $uri @fallback;
-        }
-        location @fallback {
-            proxy_set_header  X-Real-IP        $remote_addr;
-            proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
-            proxy_set_header  Host             $http_host;
-            proxy_redirect    off;
-            proxy_pass        APP_LISTEN;
-            proxy_set_header  X-Real-IP  $remote_addr;
-        }
+    location /blobs_store {
+        internal;
+        alias APP_HOME/store/blobs;
     }
-
+    location / {
+        try_files $uri @fallback;
+    }
+    location @fallback {
+        include uwsgi_params;
+        uwsgi_pass      unix:APP_HOME/log/uwsgi.keeper.sock.1;
+        uwsgi_modifier1 5;
+    }
+}
