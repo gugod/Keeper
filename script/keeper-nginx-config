@@ -20,9 +20,9 @@ __DATA__
         server_name keeper.ele.local;
         root  APP_HOME/public;
 
-        location /image_store {
+        location /blob_store {
             internal;
-            alias APP_HOME/store/images;
+            alias APP_HOME/store/blobs;
         }
         location / {
             try_files $uri @fallback;
