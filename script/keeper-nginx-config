@@ -3,13 +3,16 @@
 use FindBin;
 use Cwd;
 
-my $app_home = Cwd::realpath("$FindBin::Bin/..");
+my $app_home = $ENV{APP_HOME} || Cwd::realpath("$FindBin::Bin/..");
+my $app_host = $ENV{APP_HOST} || "keeper.example.com";
+my $app_listen = $ENV{MOJO_LISTEN} || "http://127.0.0.1:5000";
 
 local $/ = undef;
 my $config = <DATA>;
 
-my $app_home = 
-$config =~ s/APP_HOME/$app_home/sg;
+$config =~ s!APP_HOME!$app_home!sg;
+$config =~ s!APP_HOST!$app_host!sg;
+$config =~ s!APP_LISTEN!$app_listen!sg;
 
 print $config;
 
@@ -17,7 +20,7 @@ __DATA__
 
     server {
         listen 80;
-        server_name keeper.example.com;
+        server_name APP_HOST;
         root  APP_HOME/public;
 
         location /blob_store {
@@ -32,7 +35,7 @@ __DATA__
             proxy_set_header  X-Forwarded-For  $proxy_add_x_forwarded_for;
             proxy_set_header  Host             $http_host;
             proxy_redirect    off;
-            proxy_pass        http://localhost:5000;
+            proxy_pass        APP_LISTEN;
             proxy_set_header  X-Real-IP  $remote_addr;
         }
     }
