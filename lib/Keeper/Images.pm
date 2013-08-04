@@ -1,4 +1,4 @@
-package Keeper::Images;
+package Keeper::Blobs;
 use Mojo::Base 'Mojolicious::Controller';
 use Digest::SHA1 qw(sha1_hex);
 use Keeper::ImageStore;
@@ -6,16 +6,10 @@ use Keeper::ImageStore;
 sub upload {
     my $self = shift;
 
-    my $claimed_sha1 = $self->stash("sha1");
     my $claimed_format = $self->stash("format");
 
     my $body = $self->req->body;
     my $body_sha1 = sha1_hex($body);
-
-    if ($body_sha1 ne $claimed_sha1) {
-        $self->render_text("SHA1 MISMATCH", status => 400);
-        return;
-    }
 
     my $store = Keeper::ImageStore->new(root => $self->stash("image_store_root") );
     $store->put($body_sha1, $body, $claimed_format);
@@ -39,6 +33,7 @@ sub download {
 
     $path =~ s{^$image_store_root}{/image_store};
     $self->res->headers->header("X-Accel-Redirect" => $path);
+    $self->render_text("");
 }
 
 1;
