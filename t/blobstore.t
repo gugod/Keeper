@@ -13,6 +13,12 @@ for (0..10) {
     my $id = $store->put($content);
     my $content2 = $store->get($id);
     is($content, $content2, "content stored and retrieved.");
+
+    my $path = $store->get_path($id);
+    ok(-f $path);
 }
+
+my $path = $store->get_path("nonexistingid");
+ok(!-f $path);
 
 done_testing;

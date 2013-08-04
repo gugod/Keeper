@@ -14,7 +14,7 @@ sub put {
     my $digest = encode_base32 sha512 $data;
 
     my $o = io->catfile($self->root, $digest);
-    $o->print($data) unless $o->exists;
+    $o->assert->print($data) unless $o->exists;
 
     return $digest;
 }
@@ -24,6 +24,13 @@ sub get {
     my $o = io->catfile($self->root, $digest);
     return undef unless $o->exists;
     return $o->all;
+}
+
+sub get_path {
+    my ($self, $digest) = @_;
+    my $o = io->catfile($self->root, $digest);
+    return undef unless $o->exists;
+    return $o->pathname;
 }
 
 1;
