@@ -17,7 +17,7 @@ __DATA__
 
     server {
         listen 80;
-        server_name keeper.ele.local;
+        server_name keeper.example.com;
         root  APP_HOME/public;
 
         location /blob_store {
