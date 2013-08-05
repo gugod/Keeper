@@ -6,7 +6,6 @@ sub startup {
     my $self = shift;
 
     $self->defaults( "blob_store_root" => $self->app->home->rel_dir("store/blobs") );
-    $self->defaults( "image_store_root" => $self->app->home->rel_dir("store/images") );
 
     # Routes
     my $r = $self->routes;
