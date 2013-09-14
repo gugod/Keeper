@@ -1,7 +1,6 @@
 package Keeper::BlobStore;
 use Moo;
-use Digest::SHA qw(sha512);
-use Convert::Base32::Crockford qw(encode_base32);
+use Digest::SHA1 qw(sha1_base64);
 use IO::All;
 
 has root => (
@@ -11,7 +10,7 @@ has root => (
 
 sub put {
     my ($self, $data) = @_;
-    my $digest = encode_base32 sha512 $data;
+    my $digest = sha1_base64($data) =~ y!+/!-_!r;
 
     my $o = io->catfile($self->root, $digest);
     $o->assert->print($data) unless $o->exists;
