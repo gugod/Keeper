@@ -11,8 +11,7 @@ sub startup {
     my $r = $self->routes;
 
     my $blobs = $r->route("/")->to(controller => "blobs");
-    $blobs->post->to("#upload");
-    $blobs->get("/:digest")->to("#download");
+    $blobs->post("/")->to("#upload");
     $blobs->get("/:digest/:filename")->to("#download");
 }
 
