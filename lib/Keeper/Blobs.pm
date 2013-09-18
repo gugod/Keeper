@@ -8,22 +8,30 @@ use Keeper::BlobStore;
 
 sub upload {
     my $self = $_[0];
-    my $body = $self->req->body;
+    my ($filename, $body);
 
-    my $filename = $self->param("filename");
+    my $file = $self->req->upload("file");
+
+    if ($file) {
+        $filename = $file->filename;
+        $body = $file->asset->slurp;
+    }
+    else {
+        $filename = $self->param("filename");
+        $body = $self->req->body;
+    }
+
+    $filename =~ s!(\.[^\.]+)\z!!;
+    my $suffix = $1 || "";
 
     if ($filename) {
         $filename =~ s![^a-zA-Z0-9-_]!!g;
     }
-    if (!$filename) {
-        $filename = "blob";
-    }
-
+    $filename ||= "blob";
+    $filename .= $suffix;
     my $store = Keeper::BlobStore->new( root => $self->stash("blob_store_root") );
     my $digest = $store->put($body);
-
-    my $url = $self->req->url->path("/$digest/$filename")->query("")->fragment("")->to_abs;
-    $self->render(text => "$url");
+    $self->render(json => { hash => $digest, path => "/$digest/$filename" });
 }
 
 sub download {
