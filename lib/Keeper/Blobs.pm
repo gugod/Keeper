@@ -31,7 +31,7 @@ sub upload {
     $filename .= $suffix;
     my $store = Keeper::BlobStore->new( root => $self->stash("blob_store_root") );
     my $digest = $store->put($body);
-    $self->render(json => { hash => $digest, path => "/$digest/$filename" });
+    $self->render(json => { hash => $digest, filename => $filename, path => "/$digest/$filename" });
 }
 
 sub download {
