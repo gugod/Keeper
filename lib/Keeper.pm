@@ -13,6 +13,7 @@ sub startup {
     my $blobs = $r->route("/")->to(controller => "blobs");
     $blobs->post("/")->to("#upload");
     $blobs->get("/:digest/:filename")->to("#download");
+    $blobs->get("/:digest")->to("#download");
 }
 
 1;
