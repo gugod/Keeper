@@ -1,1 +1,8 @@
 Keeper -- personal media stash.
+
+Upload -
+  curl -F file=@file.png http://example.com/
+
+Download -
+  curl http://example.com/$sum/file.png
+
