@@ -5,7 +5,12 @@ use Mojo::Base 'Mojolicious';
 sub startup {
     my $self = shift;
 
-    $self->defaults( "blob_store_root" => $self->app->home->rel_dir("store/blobs") );
+    if ($ENV{KEEPER_BLOB_STORE_ROOT}) {
+        $self->defaults( "blob_store_root" => $ENV{KEEPER_BLOB_STORE_ROOT} );
+    }
+    else {
+        $self->defaults( "blob_store_root" => $self->app->home->rel_dir("store/blobs") );
+    }
 
     # Routes
     my $r = $self->routes;
