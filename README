@@ -1,8 +1,12 @@
-Keeper -- personal media stash.
+# Keeper -- personal media stash.
 
-Upload -
+## Upload
   curl -F file=@file.png http://example.com/
+  curl -XPOST http://example.com/ --data-binary @file.png
 
-Download -
+## Download
   curl http://example.com/$sum/file.png
 
+## INSTALL
+
+### uwsgi
