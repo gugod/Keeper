@@ -1,11 +1,26 @@
 # Keeper -- personal media stash.
 
 ## Upload
+
     curl -F file=@file.png http://example.com/
     curl -XPOST http://example.com/ --data-binary @file.png
 
-## Download
-    curl http://example.com/$sum/file.png
+## Download / Hot-linking
+
+The URL always looks like:
+
+    curl http://example.com/$digest/$filename
+
+The last part of the URL means "filename", an can be arbitrary. The following
+URL means the same content:
+
+    http://example.com/ZJC5o19CmYJMH9FUSYkP9dsSBLM/this.png
+    http://example.com/ZJC5o19CmYJMH9FUSYkP9dsSBLM/that.png
+
+Mordern browsers are generally smart enough to figure out what to do with
+content with very little hint from URL/content. This software does not store or
+manage the digest-to-filename mapping. The users os consuming program should
+manage the mapping externally.
 
 ## INSTALL
 
