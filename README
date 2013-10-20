@@ -1,12 +1,54 @@
 # Keeper -- personal media stash.
 
 ## Upload
-  curl -F file=@file.png http://example.com/
-  curl -XPOST http://example.com/ --data-binary @file.png
+    curl -F file=@file.png http://example.com/
+    curl -XPOST http://example.com/ --data-binary @file.png
 
 ## Download
-  curl http://example.com/$sum/file.png
+    curl http://example.com/$sum/file.png
 
 ## INSTALL
 
-### uwsgi
+The following config examples assumes the code runs from `/app/Keeper`, while
+`/data/Keeper` is the directory for blob storage.
+
+### nginx config: /etc/nginx/sites-available/keeper
+
+    server {
+        server_name example.com;
+        listen 80;
+        client_max_body_size 25m;
+    
+        root        /app/Keeper/public;
+        location /blobs_store {
+            internal;
+            alias "/data/Keeper/store/blobs";
+        }
+        location / {
+            try_files $uri @fallback;
+        }
+        location @fallback {
+            include uwsgi_params;
+            uwsgi_pass      unix:/run/uwsgi/app/keeper/socket;
+            uwsgi_modifier1 5;
+        }
+    }
+
+### uwsgi config: /etc/uwsgi/apps-available/keeper.ini
+
+    [uwsgi]
+    plugins = psgi
+    file-serve-mode = x-accel-redirect
+    app_code=/apps/Keeper
+    psgi = %(app_code)/script/keeper
+    env= MOJO_MODE=production
+    env= MOJO_HOME=%(app_code)
+    env= PERL5LIB=%(app_code)/lib:%(app_code)/local/lib/perl5
+    env= KEEPER_BLOB_STORE_ROOT=/data/Keeper/store/blobs
+
+Notice: The value of "uwsgi_pass" is absent from uwsgi config becasue it is
+arranged by ubuntu package. You might need to add the following line to match
+the value of uwsgi_pass in nginx conf:
+
+    socket = /run/uwsgi/app/keeper/socket
+
