@@ -1,0 +1,4 @@
+#!/bin/sh
+
+curl --silent -D - -F file=@$1 $KEEPER_SERVER | grep Location
+
