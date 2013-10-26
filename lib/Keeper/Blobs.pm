@@ -21,17 +21,22 @@ sub upload {
         $body = $self->req->body;
     }
 
-    $filename =~ s!(\.[^\.]+)\z!!;
-    my $suffix = $1 || "";
-
+    my $suffix = "";
     if ($filename) {
+        if ($filename =~ s!(\.[^\.]+)\z!!) {
+            $suffix = $1;
+        }
         $filename =~ s![^a-zA-Z0-9-_]!!g;
     }
     $filename ||= "blob";
     $filename .= $suffix;
     my $store = Keeper::BlobStore->new( root => $self->stash("blob_store_root") );
     my $digest = $store->put($body);
-    $self->render(json => { hash => $digest, filename => $filename, path => "/$digest/$filename" });
+    $self->res->code(302);
+
+    my $loc = $self->req->url->to_abs->clone;
+    $loc->path("/$digest/$filename");
+    $self->res->headers->location("$loc");
 }
 
 sub download {
@@ -42,10 +47,25 @@ sub download {
     my $path = $store->get_path($digest);
 
     if (!$path) {
-        $self->render_not_found;
+        $self->res->code(404);
+        $self->render(text => "");
     }
     else {
         $self->res->headers->header("X-Accel-Redirect" => "/blobs_store/$digest");
+        $self->render(text => "");
+    }
+}
+
+sub exists {
+    my $self = shift;
+    my $store = Keeper::BlobStore->new( root => $self->stash("blob_store_root") );
+    my $digest = $self->stash("digest");
+
+    my $path = $store->get_path($digest);
+    if (!$path) {
+        $self->render_not_found;
+    }
+    else {
         $self->render(text => "");
     }
 }
