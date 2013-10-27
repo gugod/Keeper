@@ -63,7 +63,8 @@ sub exists {
 
     my $path = $store->get_path($digest);
     if (!$path) {
-        $self->render_not_found;
+        $self->res->code(404);
+        $self->render(text => "");
     }
     else {
         $self->render(text => "");
