@@ -11,6 +11,14 @@ The URL always looks like:
 
     curl http://example.com/$digest/$filename
 
+## Check for existence
+
+    /_exists/$digest
+    200 OK - Object with $digest exitss
+    404 NOT FOUNT - Otherwise
+
+    curl -w '%{http_code}' http://example.com/_exists/$digest
+
 The last part of the URL means "filename", an can be arbitrary. The following
 URL means the same content:
 
