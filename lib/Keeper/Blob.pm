@@ -28,5 +28,10 @@ package Keeper::Blob {
     sub deserialize {
         return $_[0]->new( content => $_[1] );
     }
+
+    sub hashref {
+        return { content => $_[0]->content }
+    }
+
 };
 1;
