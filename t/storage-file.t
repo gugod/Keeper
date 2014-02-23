@@ -40,17 +40,21 @@ subtest "Store a name" => sub {
     is $name2->content, $name->content;
 };
 
-# subtest "Store a file" => sub {
-#     my $file = Keeper::File->new(
-#         name => "numbers.txt",
-#         blob => "31337",
-#     );
-#     my $file_key = $storage->put( $file );
-#     ok -f join("/", $base, "file", $file->id);
-#     my $file2 = $storage->get( $file_key );
-#     is $file2->id, $file->id;
-#     is $file2->blob->id, $file->blob->id;
-#     is $file2->name->id, $file->name->id;
-# };
+subtest "Store a file" => sub {
+    my $file = Keeper::File->new(
+        name => "numbers.txt",
+        blob => "31337",
+    );
+    my $file_key = $storage->put( $file );
+
+    ok -f join("/", $base, "file", $file->id), "file itself";
+    ok -f join("/", $base, "name", $file->name->id), "referenced name object";
+    ok -f join("/", $base, "blob", $file->blob->id), "referenced blob object";
+
+    # my $file2 = $storage->get( $file_key );
+    # is $file2->id, $file->id;
+    # is $file2->blob->id, $file->blob->id;
+    # is $file2->name->id, $file->name->id;
+};
 
 done_testing;

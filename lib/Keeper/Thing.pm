@@ -21,5 +21,16 @@ package Keeper::Thing {
         coerce => 1,
     );
     sub _build_serialize_for_storage { return $_[0] }
+
+    sub get_all_storage_dependecies {
+        my $self = shift;
+        my @things;
+        for my $attr ($self->meta->get_all_attributes) {
+            next unless $attr->is_required && $attr->has_type_constraint;
+            next unless $attr->type_constraint->is_subtype_of("Object");
+            push @things, scalar $attr->get_value($self);
+        }
+        return @things;
+    }
 };
 1;
