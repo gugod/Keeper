@@ -19,7 +19,7 @@ subtest "Store a blob" => sub {
 
     my $blob_key = $storage->put($blob);
 
-    my $file = join("/", $base, "blob", $blob->id);
+    my $file = $storage->path_for($blob);
     ok -f $file;
 
     my $blob2 = $storage->get($blob_key);
@@ -36,7 +36,6 @@ subtest "Store a file" => sub {
     my $file_key = $storage->put( $file );
 
     ok -f $storage->path_for($file), "the file object itself";
-    # ok -f $storage->path_for($file->name), "referenced name object";
     ok -f $storage->path_for($file->blob), "referenced blob object";
 
     subtest "retriving the file" => sub {
