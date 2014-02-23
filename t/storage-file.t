@@ -47,9 +47,9 @@ subtest "Store a file" => sub {
     );
     my $file_key = $storage->put( $file );
 
-    ok -f join("/", $base, "file", $file->id), "file itself";
-    ok -f join("/", $base, "name", $file->name->id), "referenced name object";
-    ok -f join("/", $base, "blob", $file->blob->id), "referenced blob object";
+    ok -f $storage->path_for($file), "the file object itself";
+    ok -f $storage->path_for($file->name), "referenced name object";
+    ok -f $storage->path_for($file->blob), "referenced blob object";
 
     # my $file2 = $storage->get( $file_key );
     # is $file2->id, $file->id;

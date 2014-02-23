@@ -12,12 +12,13 @@ package Keeper::Storage::File {
 
     sub put {
         my ($self, $thing) = @_;
+
+        for my $other_thing ( $thing->get_all_storage_dependecies ) {
+            $self->put($other_thing);
+        }
+
         my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
-        io->catfile(
-            $self->base,
-            $thing->type,
-            $thing->id
-        )->assert->binary->print( $type->coerce($thing) );
+        $self->io_for($thing)->assert->binary->print( $type->coerce($thing) );
         return join "/", $thing->type, $thing->id;
     }
 
@@ -31,6 +32,20 @@ package Keeper::Storage::File {
             return $type->coerce($stored);
         }
         return undef;
+    }
+
+    sub path_for {
+        my ($self, $thing) = @_;
+        return $self->io_for($thing)->name;
+    }
+
+    sub io_for {
+        my ($self, $thing) = @_;
+        return io->catfile(
+            $self->base,
+            $thing->type,
+            $thing->id
+        );
     }
 };
 1;
