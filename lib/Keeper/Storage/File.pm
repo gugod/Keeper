@@ -21,7 +21,7 @@ package Keeper::Storage::File {
 
         my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
         my $io = $self->io_for($thing);
-        if ( ($io->exists && !$thing->isa("Keeper::Blob")) || !$io->exists) {
+        if ( !$io->exists ) {
             $io->assert->binary->print( $type->coerce($thing) );
         }
         return join "/", $thing->type, $thing->id;

@@ -57,4 +57,28 @@ subtest "Store a file" => sub {
     };
 };
 
+
+subtest "Store multiple identical files" => sub {
+    my $file1 = Keeper::File->new(name => "numbers.txt", blob => "31337");
+    my $file1_key = $storage->put( $file1 );
+
+    my $file2 = Keeper::File->new(name => "numbers.txt", blob => "31337");
+    my $file2_key = $storage->put( $file2 );
+
+    is $file1_key, $file2_key;
+    is $storage->path_for($file1), $storage->path_for($file2);
+};
+
+
+subtest "Store multiple non-identical files" => sub {
+    my $file1 = Keeper::File->new(name => "numbers.txt", blob => "31337");
+    my $file1_key = $storage->put( $file1 );
+
+    my $file2 = Keeper::File->new(name => "numbers.txt", blob => "31338");
+    my $file2_key = $storage->put( $file2 );
+
+    isnt $file1_key, $file2_key;
+    isnt $storage->path_for($file1), $storage->path_for($file2);
+};
+
 done_testing;
