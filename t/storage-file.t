@@ -41,18 +41,16 @@ subtest "Store a name" => sub {
 };
 
 # subtest "Store a file" => sub {
-#     my $blob = Keeper::Blob->new( content => "313" );
-#     my $name = Keeper::Name->new( content => "numbers.txt" );
 #     my $file = Keeper::File->new(
-#         blob_id => $blob->id,
-#         name_id => $name->id,
+#         name => "numbers.txt",
+#         blob => "31337",
 #     );
 #     my $file_key = $storage->put( $file );
 #     ok -f join("/", $base, "file", $file->id);
 #     my $file2 = $storage->get( $file_key );
 #     is $file2->id, $file->id;
-#     is $file2->blob_id, $file->blob_id;
-#     is $file2->name_id, $file->name_id;
+#     is $file2->blob->id, $file->blob->id;
+#     is $file2->name->id, $file->name->id;
 # };
 
 done_testing;

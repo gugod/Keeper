@@ -14,12 +14,12 @@ package Keeper::Thing {
         die "Very wrong thing happened.";
     }
 
-    has __stored => (
+    has file_storage_serialization => (
         is => "ro",
-        isa => "Stored",
+        isa => "FileStorageSerialization",
         lazy_build => 1,
         coerce => 1,
     );
-    sub _build___stored { return $_[0] }
+    sub _build_serialize_for_storage { return $_[0] }
 };
 1;

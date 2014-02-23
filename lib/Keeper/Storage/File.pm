@@ -12,7 +12,7 @@ package Keeper::Storage::File {
 
     sub put {
         my ($self, $thing) = @_;
-        my $type = Keeper::Types::find_type_constraint("Stored");
+        my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
         io->catfile(
             $self->base,
             $thing->type,
@@ -27,7 +27,7 @@ package Keeper::Storage::File {
         my $io = io->catfile($self->base, $thing_type, $thing_id);
         if ($io->exists) {
             my $stored = $io->all;
-            my $type = Keeper::Types::find_type_constraint( ucfirst(lc($thing_type)) );
+            my $type = Keeper::Types::find_type_constraint( "Keeper::" . ucfirst(lc($thing_type)) );
             return $type->coerce($stored);
         }
         return undef;
