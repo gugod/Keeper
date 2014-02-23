@@ -23,16 +23,27 @@ subtest "Store a blob" => sub {
     ok -f $file;
 
     my $blob2 = $storage->get($blob_key);
-
     is $blob2->id, $blob->id;
     is $blob2->content, $blob->content;
 };
 
+subtest "Store multiple identical blob" => sub {
+    my $blob1 = Keeper::Blob->new( content => "123" );
+    my $blob2 = Keeper::Blob->new( content => "123" );
+
+    my $blob1_key = $storage->put($blob1);
+    my $blob2_key = $storage->put($blob1);
+
+    is $blob1_key, $blob2_key, "key should be identical";
+
+    my $blob1_file = $storage->path_for($blob1);
+    my $blob2_file = $storage->path_for($blob2);
+
+    is $blob1_file, $blob2_file, "file path should be identical";
+};
+
 subtest "Store a file" => sub {
-    my $file = Keeper::File->new(
-        name => "numbers.txt",
-        blob => "31337",
-    );
+    my $file = Keeper::File->new(name => "numbers.txt", blob => "31337");
     my $file_key = $storage->put( $file );
 
     ok -f $storage->path_for($file), "the file object itself";
