@@ -18,11 +18,12 @@ package Keeper::Storage::File {
             $thing->id
         )->assert->binary->print( $thing->serialize );
 
-        return $self;
+        return join "/", $thing->type, $thing->id;
     }
 
     sub get {
-        my ($self, $thing_type, $thing_id) = @_;
+        my ($self, $thing_key) = @_;
+        my ($thing_type, $thing_id) = split("/", $thing_key, 2);
         my $io = io->catfile($self->base, $thing_type, $thing_id);
         if ($io->exists) {
             return Keeper::Thing->deserialize( $thing_type, $io->all );
