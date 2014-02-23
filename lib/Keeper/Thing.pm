@@ -3,8 +3,6 @@ package Keeper::Thing {
     use Moose::Role;
     use Sereal qw(encode_sereal decode_sereal);
 
-    requires 'hashref';
-
     sub type {
         my $class = $_[0];
         $class = ref($class) if ref($class);
@@ -15,9 +13,20 @@ package Keeper::Thing {
         die "Very wrong thing happened.";
     }
 
+    sub asHashRef {
+        my $self = shift;
+        my $h = {};
+        for my $attr ($self->meta->get_all_attributes) {
+            if ($attr->is_required) {
+                $h->{ $attr->name } = $attr->get_value($self);
+            }
+        }
+        return $h;
+    }
+
     sub serialize {
         my $self = shift;
-        return encode_sereal( $self->hashref )
+        return encode_sereal( $self->asHashRef )
     }
 
     sub deserialize {
