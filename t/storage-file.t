@@ -51,10 +51,12 @@ subtest "Store a file" => sub {
     ok -f $storage->path_for($file->name), "referenced name object";
     ok -f $storage->path_for($file->blob), "referenced blob object";
 
-    # my $file2 = $storage->get( $file_key );
-    # is $file2->id, $file->id;
-    # is $file2->blob->id, $file->blob->id;
-    # is $file2->name->id, $file->name->id;
+    subtest "retriving the file" => sub {
+        my $file2 = $storage->get( $file_key );
+        is $file2->id, $file->id, "file id matches";
+        is $file2->blob->id, $file->blob->id, "referenced blob id matches";
+        is $file2->name->id, $file->name->id, "referenced name id matches";
+    };
 };
 
 done_testing;

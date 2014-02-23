@@ -10,6 +10,7 @@ package Keeper::Types {
     class_type 'Keeper::File';
 
     subtype FileStorageSerialization => as 'Str';
+    subtype FileStorageHashRef => as 'HashRef';
 
     coerce 'Keeper::Blob'
     => from 'HashRef',    via { Keeper::Blob->new(%$_) }
@@ -20,17 +21,17 @@ package Keeper::Types {
     => from 'Str', via { Keeper::Name->new( content => $_[0] ) };
 
     coerce 'Keeper::File'
-    => from 'FileStorageSerialization', via {
-
-    };
+    => from 'HashRef', via { Keeper::File->new(%$_) };
 
     coerce 'FileStorageSerialization'
     => from 'Keeper::Blob', via { $_[0]->content },
     => from 'Keeper::Name', via { $_[0]->content },
     => from 'Keeper::File', via {
         $JSON->encode({
-            name_id => $_->name->id,
-            blob_id => $_->blob->id,
+            '$ref' => {
+                name => $_->name->id,
+                blob => $_->blob->id
+            }
         });
     };
 
