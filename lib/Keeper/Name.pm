@@ -11,12 +11,6 @@ package Keeper::Name {
 
     sub id { $_[0]->content }
 
-    sub serialize {
-        return $_[0]->content;
-    }
-    sub deserialize {
-        return $_[0]->new( content => $_[1] );
-    }
 };
 
 1;

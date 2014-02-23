@@ -1,6 +1,7 @@
 use v5.14;
 package Keeper::Storage::File {
     use Moose;
+    use Keeper::Types;
     use Keeper::Thing ();
     use IO::All;
 
@@ -11,13 +12,12 @@ package Keeper::Storage::File {
 
     sub put {
         my ($self, $thing) = @_;
-
+        my $type = Keeper::Types::find_type_constraint("Stored");
         io->catfile(
             $self->base,
             $thing->type,
             $thing->id
-        )->assert->binary->print( $thing->serialize );
-
+        )->assert->binary->print( $type->coerce($thing) );
         return join "/", $thing->type, $thing->id;
     }
 
@@ -26,7 +26,9 @@ package Keeper::Storage::File {
         my ($thing_type, $thing_id) = split("/", $thing_key, 2);
         my $io = io->catfile($self->base, $thing_type, $thing_id);
         if ($io->exists) {
-            return Keeper::Thing->deserialize( $thing_type, $io->all );
+            my $stored = $io->all;
+            my $type = Keeper::Types::find_type_constraint( ucfirst(lc($thing_type)) );
+            return $type->coerce($stored);
         }
         return undef;
     }

@@ -1,7 +1,6 @@
 use v5.14;
 package Keeper::Blob {
-    use Moose;
-    with 'Keeper::Thing';
+    use Moose; with 'Keeper::Thing';
     use Keeper::Tools 'sha1_base64url';
 
     has content => (
@@ -18,14 +17,6 @@ package Keeper::Blob {
 
     sub _build_id {
         return sha1_base64url( $_[0]->content )
-    }
-
-    sub serialize {
-        return $_[0]->content;
-    }
-
-    sub deserialize {
-        return $_[0]->new( content => $_[1] );
     }
 };
 
