@@ -5,11 +5,9 @@ package Keeper::Thing {
     use Sereal qw(encode_sereal decode_sereal);
 
     sub type {
-        my $class = $_[0];
-        $class = ref($class) if ref($class);
-
-        if ($class =~ m/^Keeper::([^:]+)$/) {
-            return lc($1);
+        my $class = ref($_[0]) || $_[0];
+        if ($class->does("Keeper::Thing") && $class =~ m/^Keeper::([^:]+)$/) {
+            return $1;
         }
         die "Very wrong thing happened.";
     }
