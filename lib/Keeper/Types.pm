@@ -24,8 +24,8 @@ package Keeper::Types {
     => from 'HashRef', via { Keeper::File->new(%$_) };
 
     coerce 'FileStorageSerialization'
-    => from 'Keeper::Blob', via { $_[0]->content },
-    => from 'Keeper::Name', via { $_[0]->content },
+    => from 'Keeper::Blob', via { $_->content },
+    => from 'Keeper::Name', via { $_->content },
     => from 'Keeper::File', via {
         $JSON->encode({
             '$ref' => {
