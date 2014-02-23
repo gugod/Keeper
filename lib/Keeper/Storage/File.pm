@@ -38,7 +38,7 @@ package Keeper::Storage::File {
             my $stored = $io->all;
             my $hashref;
 
-            if (substr($stored, 0, 1) eq '{' && substr($stored, -1, 1) eq '}') {
+            if ($thing_class ne 'Keeper::Blob' && substr($stored, 0, 1) eq '{' && substr($stored, -1, 1) eq '}') {
                 eval { $hashref = $JSON->decode($stored) };
                 if ($hashref) {
                     if (exists $hashref->{'$ref'}) {

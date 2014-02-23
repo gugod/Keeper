@@ -42,6 +42,17 @@ subtest "Store multiple identical blob" => sub {
     is $blob1_file, $blob2_file, "file path should be identical";
 };
 
+subtest "Store a blob that looks like a valid piece of JSON" => sub {
+    my $blob = Keeper::Blob->new( content => '{"a":1}' );
+    my $blob_key = $storage->put($blob);
+
+    ok $blob_key, $blob_key;
+
+    my $blob2 = $storage->get($blob_key);
+    is $blob2->id, $blob->id;
+    is $blob2->content, $blob->content;
+};
+
 subtest "Store a file" => sub {
     my $file = Keeper::File->new(name => "numbers.txt", blob => "31337");
     my $file_key = $storage->put( $file );
