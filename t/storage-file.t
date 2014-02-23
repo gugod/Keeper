@@ -6,7 +6,6 @@ use Test::More;
 use File::Path qw(remove_tree);
 
 use Keeper::Blob;
-use Keeper::Name;
 use Keeper::File;
 use Keeper::Storage::File;
 
@@ -29,17 +28,6 @@ subtest "Store a blob" => sub {
     is $blob2->content, $blob->content;
 };
 
-subtest "Store a name" => sub {
-    my $name = Keeper::Name->new( content => "espresso" );
-    my $name_key = $storage->put( $name );
-
-    ok -f join("/", $base, "name", $name->id);
-
-    my $name2 = $storage->get( $name_key );
-    is $name2->id, $name->id;
-    is $name2->content, $name->content;
-};
-
 subtest "Store a file" => sub {
     my $file = Keeper::File->new(
         name => "numbers.txt",
@@ -48,14 +36,14 @@ subtest "Store a file" => sub {
     my $file_key = $storage->put( $file );
 
     ok -f $storage->path_for($file), "the file object itself";
-    ok -f $storage->path_for($file->name), "referenced name object";
+    # ok -f $storage->path_for($file->name), "referenced name object";
     ok -f $storage->path_for($file->blob), "referenced blob object";
 
     subtest "retriving the file" => sub {
         my $file2 = $storage->get( $file_key );
         is $file2->id, $file->id, "file id matches";
+        is $file2->name, $file->name, "file name matches";
         is $file2->blob->id, $file->blob->id, "referenced blob id matches";
-        is $file2->name->id, $file->name->id, "referenced name id matches";
     };
 };
 

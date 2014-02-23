@@ -4,14 +4,12 @@ package Keeper::File {
     with 'Keeper::Thing';
     use Keeper::Types;
     use Keeper::Blob;
-    use Keeper::Name;
     use Keeper::Tools qw(sha1_base64url);
 
     has name => (
         is => "ro",
-        isa => 'Keeper::Name',
+        isa => 'Str',
         required => 1,
-        coerce => 1,
     );
 
     has blob => (
@@ -29,7 +27,7 @@ package Keeper::File {
 
     sub _build_id {
         my $self = shift;
-        return sha1_base64url( $self->name->id . $self->blob->id );
+        return sha1_base64url( $self->name . $self->blob->id );
     }
 };
 

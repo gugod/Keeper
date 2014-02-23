@@ -1,6 +1,7 @@
 use v5.14;
 package Keeper::Blob {
-    use Moose; with 'Keeper::Thing';
+    use Moose;
+    with 'Keeper::Thing';
     use Keeper::Tools 'sha1_base64url';
 
     has content => (
