@@ -4,13 +4,13 @@ package Keeper::Types {
     use Moose::Util::TypeConstraints;
 
     subtype Blob => as class_type 'Keeper::Blob';
+    subtype Name => as class_type 'Keeper::Name';
     subtype Stored => as 'Str';
 
     coerce 'Blob'
     => from 'HashRef',    via { Keeper::Blob->new(%$_) }
     => from 'Str',        via { Keeper::Blob->new( content => $_[0] ) };
 
-    subtype 'Name' => as class_type 'Keeper::Name';
     coerce 'Name'
     => from 'HashRef', via { Keeper::Name->new(%$_) }
     => from 'Str', via { Keeper::Name->new( content => $_[0] ) };
