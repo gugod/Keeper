@@ -20,6 +20,7 @@ subtest "Store a blob" => sub {
 
     my $blob_key = $storage->put($blob);
 
+    diag "The blob key is $blob_key";
     my $file = $storage->path_for($blob);
     ok -f $file;
 
@@ -55,23 +56,25 @@ subtest "Store a blob that looks like a valid piece of JSON" => sub {
 };
 
 subtest "Store a thing" => sub {
-    my $file = Keeper::Thing->new(
+    my $thing = Keeper::Thing->new(
         type => "file",
         attributes => {
             name => "numbers.txt",
         },
         blob => "31337",
     );
-    my $file_key = $storage->put( $file );
+    my $thing_key = $storage->put( $thing );
 
-    ok -f $storage->path_for($file), "the file object itself";
-    ok -f $storage->path_for($file->blob), "referenced blob object";
+    diag "The stored thing is keyed $thing_key";
+
+    ok -f $storage->path_for($thing), "the file object itself";
+    ok -f $storage->path_for($thing->blob), "referenced blob object";
 
     subtest "retriving the thing" => sub {
-        my $file2 = $storage->get( $file_key );
-        is $file2->id, $file->id, "file id matches";
-        is $file2->attributes->{name}, $file->attributes->{name}, "attribute content matches";
-        is $file2->blob->id, $file->blob->id, "referenced blob id matches";
+        my $thing2 = $storage->get( $thing_key );
+        is $thing2->id, $thing->id, "file id matches";
+        is $thing2->attributes->{name}, $thing->attributes->{name}, "attribute content matches";
+        is $thing2->blob->id, $thing->blob->id, "referenced blob id matches";
     };
 };
 

@@ -14,20 +14,19 @@ package Keeper::Storage::File {
 
     sub put {
         my ($self, $thing) = @_;
-
         if ($thing->isa("Keeper::Thing")) {
             $self->put($thing->blob);
         }
-        elsif (! $thing->isa("Keeper::Blob") ) {
-            die "I have no clue how to store " . ref($thing);
-        }
 
-        my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
         my $io = $self->io_for($thing);
         if ( !$io->exists ) {
+            my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
             $io->assert->binary->print( $type->coerce($thing) );
         }
-        return join "/", $thing->type, $thing->id;
+        my $key = $io->name;
+        my $base = $self->base;
+        $key =~ s{\A$base/}{};
+        return $key;
     }
 
     sub get {
@@ -70,9 +69,19 @@ package Keeper::Storage::File {
 
     sub io_for {
         my ($self, $thing) = @_;
+        my @part = ();
+
+        if ($thing->isa("Keeper::Thing")) {
+            $self->put($thing->blob);
+            push @part, "thing", $thing->type;
+        }
+        elsif ( $thing->isa("Keeper::Blob") ) {
+            push @part, "blob";
+        }
+
         return io->catfile(
             $self->base,
-            $thing->type,
+            @part,
             $thing->id
         );
     }
