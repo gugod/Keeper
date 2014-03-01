@@ -15,8 +15,11 @@ package Keeper::Storage::File {
     sub put {
         my ($self, $thing) = @_;
 
-        for my $other_thing ( $thing->get_all_storage_dependecies ) {
-            $self->put($other_thing);
+        if ($thing->isa("Keeper::Thing")) {
+            $self->put($thing->blob);
+        }
+        elsif (! $thing->isa("Keeper::Blob") ) {
+            die "I have no clue how to store " . ref($thing);
         }
 
         my $type = Keeper::Types::find_type_constraint("FileStorageSerialization");
@@ -30,30 +33,31 @@ package Keeper::Storage::File {
     sub get {
         my ($self, $thing_key) = @_;
         my ($thing_type, $thing_id) = split("/", $thing_key, 2);
-        my $thing_class = "Keeper::" . ucfirst(lc($thing_type));
+        my $thing_class = "Keeper::" . (($thing_type eq "blob") ? "Blob" : "Thing");
         my $type = Keeper::Types::find_type_constraint( $thing_class );
         my $io = io->catfile($self->base, $thing_type, $thing_id);
 
         if ($io->exists && $type) {
             my $stored = $io->all;
-            my $hashref;
 
-            if ($thing_class ne 'Keeper::Blob' && substr($stored, 0, 1) eq '{' && substr($stored, -1, 1) eq '}') {
-                eval { $hashref = $JSON->decode($stored) };
-                if ($hashref) {
-                    if (exists $hashref->{'$ref'}) {
-                        my $ref = delete $hashref->{'$ref'};
-                        for my $attr_name (keys %$ref) {
-                            my $attr_thing_id = $ref->{$attr_name};
-                            my $attr = $thing_class->meta->get_attribute( $attr_name ) or next;
-                            my $attr_thing_type = lc((split(/::/, $attr->type_constraint->name))[-1]);
-                            $hashref->{$attr_name} = $self->get( $attr_thing_type . "/" . $attr_thing_id );
-                        }
-                    }
-                }
+            if ($thing_class eq 'Keeper::Blob') {
+                return $type->coerce($stored);
             }
 
-            return $type->coerce($hashref || $stored);
+            my $hashref;
+            eval { $hashref = $JSON->decode($stored) };
+            if ($hashref) {
+                if (exists $hashref->{'$ref'}) {
+                    my $ref = delete $hashref->{'$ref'};
+                    for my $attr_name (keys %$ref) {
+                        my $attr_thing_id = $ref->{$attr_name};
+                        my $attr = $thing_class->meta->get_attribute( $attr_name ) or next;
+                        my $attr_thing_type = lc((split(/::/, $attr->type_constraint->name))[-1]);
+                        $hashref->{$attr_name} = $self->get( $attr_thing_type . "/" . $attr_thing_id );
+                    }
+                }
+                return $type->coerce($hashref)
+            }
         }
 
         return undef;

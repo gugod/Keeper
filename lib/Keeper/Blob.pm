@@ -1,8 +1,10 @@
 use v5.14;
 package Keeper::Blob {
     use Moose;
-    with 'Keeper::Thing';
+    use Keeper::Types;
     use Keeper::Tools 'sha1_base64url';
+
+    sub type() { "blob" }
 
     has content => (
         is => "ro",

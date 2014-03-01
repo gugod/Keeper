@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 
 use v5.14;
 use strict;
@@ -6,7 +7,7 @@ use Test::More;
 use File::Path qw(remove_tree);
 
 use Keeper::Blob;
-use Keeper::File;
+use Keeper::Thing;
 use Keeper::Storage::File;
 
 my $base = "/tmp/keeper-test";
@@ -53,43 +54,25 @@ subtest "Store a blob that looks like a valid piece of JSON" => sub {
     is $blob2->content, $blob->content;
 };
 
-subtest "Store a file" => sub {
-    my $file = Keeper::File->new(name => "numbers.txt", blob => "31337");
+subtest "Store a thing" => sub {
+    my $file = Keeper::Thing->new(
+        type => "file",
+        attributes => {
+            name => "numbers.txt",
+        },
+        blob => "31337",
+    );
     my $file_key = $storage->put( $file );
 
     ok -f $storage->path_for($file), "the file object itself";
     ok -f $storage->path_for($file->blob), "referenced blob object";
 
-    subtest "retriving the file" => sub {
+    subtest "retriving the thing" => sub {
         my $file2 = $storage->get( $file_key );
         is $file2->id, $file->id, "file id matches";
-        is $file2->name, $file->name, "file name matches";
+        is $file2->attributes->{name}, $file->attributes->{name}, "attribute content matches";
         is $file2->blob->id, $file->blob->id, "referenced blob id matches";
     };
-};
-
-
-subtest "Store multiple identical files" => sub {
-    my $file1 = Keeper::File->new(name => "numbers.txt", blob => "31337");
-    my $file1_key = $storage->put( $file1 );
-
-    my $file2 = Keeper::File->new(name => "numbers.txt", blob => "31337");
-    my $file2_key = $storage->put( $file2 );
-
-    is $file1_key, $file2_key;
-    is $storage->path_for($file1), $storage->path_for($file2);
-};
-
-
-subtest "Store multiple non-identical files" => sub {
-    my $file1 = Keeper::File->new(name => "numbers.txt", blob => "31337");
-    my $file1_key = $storage->put( $file1 );
-
-    my $file2 = Keeper::File->new(name => "numbers.txt", blob => "31338");
-    my $file2_key = $storage->put( $file2 );
-
-    isnt $file1_key, $file2_key;
-    isnt $storage->path_for($file1), $storage->path_for($file2);
 };
 
 done_testing;

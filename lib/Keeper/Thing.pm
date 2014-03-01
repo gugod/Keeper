@@ -1,34 +1,42 @@
 use v5.14;
 package Keeper::Thing {
-    use Moose::Role;
+    use Moose;
     use Keeper::Types;
-    use Sereal qw(encode_sereal decode_sereal);
+    use Keeper::Tools 'sha1_base64url';
 
-    sub type {
-        my $class = ref($_[0]) || $_[0];
-        if ($class->does("Keeper::Thing") && $class =~ m/^Keeper::([^:]+)$/) {
-            return $1;
-        }
-        die "Very wrong thing happened.";
-    }
-
-    has file_storage_serialization => (
+    has type => (
         is => "ro",
-        isa => "FileStorageSerialization",
-        lazy_build => 1,
+        isa => "Str",
+        required => 1,
+    );
+
+    has blob => (
+        is => "ro",
+        isa => 'Keeper::Blob',
+        required => 1,
         coerce => 1,
     );
-    sub _build_serialize_for_storage { return $_[0] }
 
-    sub get_all_storage_dependecies {
+    has attributes => (
+        is => "ro",
+        isa => "HashRef",
+        default => sub { {} }
+    );
+
+    has id => (
+        is => "ro",
+        isa => "Str",
+        lazy_build => 1
+    );
+
+    sub _build_id {
         my $self = shift;
-        my @things;
-        for my $attr ($self->meta->get_all_attributes) {
-            next unless $attr->is_required && $attr->has_type_constraint;
-            next unless $attr->type_constraint->is_subtype_of("Object");
-            push @things, scalar $attr->get_value($self);
-        }
-        return @things;
+        my $attrs = $self->attributes;
+        return sha1_base64url(join(
+            "\n",
+            (map { ($_, $attrs->{$_}) } (sort keys %$attrs)),
+            $self->blob->id,
+        ));
     }
 };
 1;
