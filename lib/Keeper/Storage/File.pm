@@ -10,6 +10,7 @@ package Keeper::Storage::File {
     has base => (
         is => "ro",
         isa => "Str",
+        required => 1
     );
 
     sub put {

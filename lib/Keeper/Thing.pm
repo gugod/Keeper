@@ -2,6 +2,7 @@ use v5.14;
 package Keeper::Thing {
     use Moose;
     use Keeper::Types;
+    use Keeper::Blob;
     use Keeper::Tools 'sha1_base64url';
 
     has type => (

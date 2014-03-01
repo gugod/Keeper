@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use v5.14;
+use strict;
+use warnings;
+use IO::All;
+use Keeper::Thing;
+use Keeper::Storage::File;
+
+my $storage = Keeper::Storage::File->new( base => "$ENV{HOME}/.keeper/storage" );
+
+my %ARGS = @ARGV; # yes
+my $blob;
+
+die "No type" unless $ARGS{"--type"};
+die "No blob" unless $blob = $ARGS{"--blob"};
+
+my $attrs = {};
+for (keys %ARGS) {
+  if (/\A--attr-(.+)$/) {
+    $attrs->{$1} = $ARGS{$_};
+  }
+}
+
+if (substr($blob,0,1) eq "@") {
+  my $path = substr($blob,1);
+  my $io = io($path);
+  $blob = $io->all;
+  $attrs->{"keeper.file_name"} = $io->filename;
+  $attrs->{"keeper.file_absolute_path"} = $io->absolute->pathname;
+}
+
+my $obj = Keeper::Thing->new(
+type =>  $ARGS{"--type"},
+blob =>  $blob,
+attributes => $attrs,
+);
+my $k = $storage->put($obj);
+
+say "base = " . $storage->base;
+say "put $k";
