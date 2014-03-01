@@ -8,6 +8,19 @@ use Keeper::Storage::File;
 
 my $storage = Keeper::Storage::File->new( base => "$ENV{HOME}/.keeper/storage" );
 
+unless (@ARGV) {
+    print <<USAGE;
+
+Usage:
+    keeper-put-thing --type note --blob "The thing"
+    keeper-put-thing --type note --blob \@content.txt
+    keeper-put-thing --type picture --attr-tags family --blob \@mypic.jpg
+
+USAGE
+
+exit;
+}
+
 my %ARGS = @ARGV;               # yes
 my $blob;
 
