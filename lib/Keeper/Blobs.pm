@@ -51,13 +51,16 @@ sub download {
     if (!$path) {
         return $self->helpers->reply->not_found;
     }
-    if ($self->req->headers->header('X-Keeper-Use-X-Accel')) {
-        $self->res->headers->header("X-Accel-Redirect" => "/blobs_store/$digest");
-        $self->render(text => "");
+
+    if (defined($ENV{KEEPER_FILE_SERVE_MODE})) {
+        if (lc($ENV{KEEPER_FILE_SERVE_MODE}) eq 'x-accel-redirect') {
+            $self->res->headers->header("X-Accel-Redirect" => "/blobs_store/$digest");
+            $self->render(text => "");
+            return;
+        }
     }
-    else {
-        $self->helpers->reply->asset(Mojo::Asset::File->new(path => $path));
-    }
+
+    return $self->helpers->reply->asset(Mojo::Asset::File->new(path => $path));
 }
 
 sub exists {
