@@ -4,6 +4,8 @@ use warnings;
 
 package Keeper::Blobs;
 use Mojo::Base 'Mojolicious::Controller';
+use Mojo::Asset::File;
+
 use Keeper::BlobStore;
 
 sub upload {
@@ -47,12 +49,14 @@ sub download {
     my $path = $store->get_path($digest);
 
     if (!$path) {
-        $self->res->code(404);
+        return $self->helpers->reply->not_found;
+    }
+    if ($self->req->headers->header('X-Keeper-Use-X-Accel')) {
+        $self->res->headers->header("X-Accel-Redirect" => "/blobs_store/$digest");
         $self->render(text => "");
     }
     else {
-        $self->res->headers->header("X-Accel-Redirect" => "/blobs_store/$digest");
-        $self->render(text => "");
+        $self->helpers->reply->asset(Mojo::Asset::File->new(path => $path));
     }
 }
 
