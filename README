@@ -2,28 +2,28 @@
 
 ## Upload
 
-    curl -F file=@file.png http://example.com/
-    curl -XPOST http://example.com/ --data-binary @file.png
+    curl -F file=@file.png http://example.com/blobs/
+    curl -XPOST http://example.com/blobs/ --data-binary @file.png
 
 ## Download / Hot-linking
 
 The URL always looks like:
 
-    curl http://example.com/$digest/$filename
+    curl http://example.com/blobs/$digest/$filename
 
 ## Check for existence
 
-    /_exists/$digest
+    /blobs/_exists/$digest
     200 OK - Object with $digest exitss
     404 NOT FOUNT - Otherwise
 
-    curl -w '%{http_code}' http://example.com/_exists/$digest
+    curl -w '%{http_code}' http://example.com/blobs/_exists/$digest
 
 The last part of the URL means "filename", an can be arbitrary. The following
 URL means the same content:
 
-    http://example.com/ZJC5o19CmYJMH9FUSYkP9dsSBLM/this.png
-    http://example.com/ZJC5o19CmYJMH9FUSYkP9dsSBLM/that.png
+    http://example.com/blobs/ZJC5o19CmYJMH9FUSYkP9dsSBLM/this.png
+    http://example.com/blobs/ZJC5o19CmYJMH9FUSYkP9dsSBLM/that.png
 
 Mordern browsers are generally smart enough to figure out what to do with
 content with very little hint from URL/content. This software does not store or

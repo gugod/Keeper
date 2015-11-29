@@ -37,7 +37,7 @@ sub upload {
     $self->res->code(302);
 
     my $loc = $self->req->url->to_abs->clone;
-    $loc->path("/$digest/$filename");
+    $loc->path("/blobs/$digest/$filename");
     $self->res->headers->location("$loc");
 }
 

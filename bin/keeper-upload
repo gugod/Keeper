@@ -13,10 +13,10 @@ if [[ -f $input_file ]]; then
     input_file_basename=$(basename $input_file)
     input_file_digest=$( ${bin_dir}/keeper-sha1sum-base64 $input_file | cut -f1 )
 
-    if [[ "200" == $(curl --silent -w "%{http_code}" -o /dev/null "${KEEPER_SERVER}/_exists/${input_file_digest}") ]]; then
-        echo "Location: ${KEEPER_SERVER}/${input_file_digest}/${input_file_basename}"
+    if [[ "200" == $(curl --silent -w "%{http_code}" -o /dev/null "${KEEPER_SERVER}/blobs/_exists/${input_file_digest}") ]]; then
+        echo "Location: ${KEEPER_SERVER}/blobs/${input_file_digest}/${input_file_basename}"
     else
-        curl --silent -D - -F file=@$1 $KEEPER_SERVER | grep Location
+        curl --silent -D - -F file=@$1 ${KEEPER_SERVER}/blobs | grep Location
     fi
 else
     echo "ERROR: File $input_file not found"
